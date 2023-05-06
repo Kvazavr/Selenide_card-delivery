@@ -9,6 +9,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -18,9 +19,8 @@ import java.util.Date;
 
 public class CardDeliveryTest {
     @Test
-    void shouldBeSuccessCardOrder() throws InterruptedException {
+    void shouldBeSuccessCardOrder(){
         open("http://localhost:9999/");
-//        $("[data-test-id=city]").click();
         $("[type = text]").setValue("Ижевск");
         $("[data-test-id=date]").click();
         $("[data-test-id=date] [value]").sendKeys(Keys.CONTROL + "a");
@@ -30,21 +30,10 @@ public class CardDeliveryTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String format = validDate.format(dateTimeFormatter);
         $("[data-test-id=date] [value]").setValue(format);
-//        Thread.sleep(10000);
-//        $("[data-test-id=name]").click();
         $("[name = name]").setValue("Некрасова Елена");
-//        $("[data-test-id=phone]").click();
         $("[name = phone]").setValue("+79085552211");
         $("[data-test-id=agreement]").click();
-        $("[type = button]").click();
-
-
-//        Date date = new Date();
-//        System.out.println(date);
-//        $("[data-test-id=date]").clear();
-//        $("input value").setValue("10.05.2023");
-
+        $(".button__text").click();
+        $x("//*[contains(text(), 'Встреча успешно забронирована')]").should(appear, Duration.ofSeconds(15));
     }
-
-
 }
