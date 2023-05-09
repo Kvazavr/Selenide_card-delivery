@@ -6,34 +6,33 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.CollectionCondition.*;
 import static java.time.temporal.ChronoUnit.DAYS;
 
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
 
 public class CardDeliveryTest {
+    public String generateDate(long addDays, String pattern) {
+        return LocalDate.now().plusDays(addDays).format(DateTimeFormatter.ofPattern(pattern));
+    }
+
     @Test
-    void shouldBeSuccessCardOrder(){
+    void shouldBeSuccessCardOrder() {
         open("http://localhost:9999/");
         $("[type = text]").setValue("Ижевск");
         $("[data-test-id=date]").click();
         $("[data-test-id=date] [value]").sendKeys(Keys.CONTROL + "a");
         $("[data-test-id=date] [value]").sendKeys(Keys.BACK_SPACE);
-        LocalDateTime currentDay = LocalDateTime.now();
-        LocalDateTime validDate = currentDay.plus(3, DAYS);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String format = validDate.format(dateTimeFormatter);
-        $("[data-test-id=date] [value]").setValue(format);
+        String planningDate = generateDate(4, "dd.MM.yyyy");
+        $("[data-test-id=date] [value]").setValue(planningDate);
         $("[name = name]").setValue("Некрасова Елена");
         $("[name = phone]").setValue("+79085552211");
         $("[data-test-id=agreement]").click();
         $(".button__text").click();
-        $x("//*[contains(text(), 'Встреча успешно забронирована')]").should(appear, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15)).shouldBe(Condition.visible);
     }
 }
